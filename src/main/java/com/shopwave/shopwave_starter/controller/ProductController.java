@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +37,7 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductDTO> create(@RequestBody ProductDTO dto) {
+    public ResponseEntity<ProductDTO> create(@Valid @RequestBody ProductDTO dto) {
         return ResponseEntity.status(201).body(service.createProduct(dto));
     }
 
