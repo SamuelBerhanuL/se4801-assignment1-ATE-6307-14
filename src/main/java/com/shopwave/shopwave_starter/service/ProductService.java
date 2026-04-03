@@ -1,12 +1,15 @@
 package com.shopwave.shopwave_starter.service;
 
+import com.shopwave.shopwave_starter.dto.ProductDTO;
 import com.shopwave.shopwave_starter.exception.ProductNotFoundException;
+import com.shopwave.shopwave_starter.mapper.ProductMapper;
 import com.shopwave.shopwave_starter.model.Product;
 import com.shopwave.shopwave_starter.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -18,23 +21,31 @@ public class ProductService {
         this.repository = repository;
     }
 
-    public Product createProduct(Product product) {
-        return repository.save(product);
+    public ProductDTO createProduct(ProductDTO dto) {
+        Product product = ProductMapper.toEntity(dto);
+        Product saved = repository.save(product);
+        return ProductMapper.toDTO(saved);
     }
 
     @Transactional(readOnly = true)
-    public List<Product> getAllProducts() {
-        return repository.findAll();
+    public List<ProductDTO> getAllProducts() {
+        return repository.findAll()
+                .stream()
+                .map(ProductMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public Product getProductById(Long id) {
-        return repository.findById(id)
+    public ProductDTO getProductById(Long id) {
+        Product product = repository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException(id));
+
+        return ProductMapper.toDTO(product);
     }
 
-    public Product updateStock(Long id, int delta) {
-        Product product = getProductById(id);
+    public ProductDTO updateStock(Long id, int delta) {
+        Product product = repository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException(id));
 
         int newStock = product.getStock() + delta;
 
@@ -43,6 +54,7 @@ public class ProductService {
         }
 
         product.setStock(newStock);
-        return repository.save(product);
+
+        return ProductMapper.toDTO(repository.save(product));
     }
 }
