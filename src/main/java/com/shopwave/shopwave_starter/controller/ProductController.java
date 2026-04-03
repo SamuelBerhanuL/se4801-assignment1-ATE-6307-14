@@ -1,6 +1,6 @@
 package com.shopwave.shopwave_starter.controller;
 
-import com.shopwave.shopwave_starter.model.Product;
+import com.shopwave.shopwave_starter.dto.ProductDTO;
 import com.shopwave.shopwave_starter.service.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,22 +19,22 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Product>> getAll() {
+    public ResponseEntity<List<ProductDTO>> getAll() {
         return ResponseEntity.ok(service.getAllProducts());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getById(@PathVariable Long id) {
+    public ResponseEntity<ProductDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(service.getProductById(id));
     }
 
     @PostMapping
-    public ResponseEntity<Product> create(@RequestBody Product product) {
-        return ResponseEntity.status(201).body(service.createProduct(product));
+    public ResponseEntity<ProductDTO> create(@RequestBody ProductDTO dto) {
+        return ResponseEntity.status(201).body(service.createProduct(dto));
     }
 
     @PatchMapping("/{id}/stock")
-    public ResponseEntity<Product> updateStock(
+    public ResponseEntity<ProductDTO> updateStock(
             @PathVariable Long id,
             @RequestBody Map<String, Integer> body
     ) {
