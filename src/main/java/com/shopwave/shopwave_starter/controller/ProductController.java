@@ -5,6 +5,10 @@ import com.shopwave.shopwave_starter.service.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 import java.util.Map;
 
@@ -19,8 +23,12 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductDTO>> getAll() {
-        return ResponseEntity.ok(service.getAllProducts());
+    public ResponseEntity<Page<ProductDTO>> getAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(service.getAllProducts(pageable));
     }
 
     @GetMapping("/{id}")
@@ -38,6 +46,16 @@ public class ProductController {
             @PathVariable Long id,
             @RequestBody Map<String, Integer> body
     ) {
-        return ResponseEntity.ok(service.updateStock(id, body.get("delta")));
+        Integer delta = body.get("delta");
+        if (delta == null) {
+            throw new IllegalArgumentException("Delta value is required");
+        }
+        return ResponseEntity.ok(service.updateStock(id, delta));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<ProductDTO>> searchProducts(
+            @RequestParam("keyword") String keyword) {
+        return ResponseEntity.ok(service.searchProductsByName(keyword));
     }
 }

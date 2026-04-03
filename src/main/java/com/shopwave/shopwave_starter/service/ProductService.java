@@ -8,6 +8,9 @@ import com.shopwave.shopwave_starter.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,11 +31,8 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProductDTO> getAllProducts() {
-        return repository.findAll()
-                .stream()
-                .map(ProductMapper::toDTO)
-                .collect(Collectors.toList());
+    public Page<ProductDTO> getAllProducts(Pageable pageable) {
+        return repository.findAll(pageable).map(ProductMapper::toDTO);
     }
 
     @Transactional(readOnly = true)
@@ -56,5 +56,13 @@ public class ProductService {
         product.setStock(newStock);
 
         return ProductMapper.toDTO(repository.save(product));
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductDTO> searchProductsByName(String keyword) {
+        return repository.findByNameContainingIgnoreCase(keyword)
+                .stream()
+                .map(ProductMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }
