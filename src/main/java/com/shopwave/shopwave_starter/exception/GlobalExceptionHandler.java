@@ -1,7 +1,5 @@
 package com.shopwave.shopwave_starter.exception;
 
-package com.shopwave.exception;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
